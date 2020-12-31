@@ -29,12 +29,13 @@ module Sinatra
     # Returns an array of acceptable media types for the response
     def accept
       @env['sinatra.accept'] ||= begin
-        if @env.include? 'HTTP_ACCEPT' and @env['HTTP_ACCEPT'].to_s != ''
-          @env['HTTP_ACCEPT'].to_s.scan(HEADER_VALUE_WITH_PARAMS).
-            map! { |e| AcceptEntry.new(e) }.sort
-        else
-          [AcceptEntry.new('*/*')]
-        end
+        http_accept = @env['HTTP_ACCEPT'].to_s
+        return [AcceptEntry.new('*/*')] if http_accept == ''
+
+        http_accept
+          .scan(HEADER_VALUE_WITH_PARAMS)
+          .map! { |e| AcceptEntry.new(e) }
+          .sort!
       end
     end
 
